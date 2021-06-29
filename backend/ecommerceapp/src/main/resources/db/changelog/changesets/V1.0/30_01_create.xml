@@ -1,0 +1,65 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="AFO2021" author="30032021-01">
+        <sql>
+            CREATE TABLE IF NOT EXISTS product_category (
+            id SERIAL NOT NULL,
+            category_name VARCHAR(255) NULL DEFAULT NULL,
+            PRIMARY KEY (id));
+
+            CREATE TABLE IF NOT EXISTS product (
+            id serial NOT NULL ,
+            sku VARCHAR(255) DEFAULT NULL,
+            name VARCHAR(255) DEFAULT NULL,
+            description VARCHAR(255) DEFAULT NULL,
+            unit_price DECIMAL(13,2) DEFAULT NULL,
+            image_url VARCHAR(255) DEFAULT NULL,
+            active BIT(1) DEFAULT B'1',
+            units_in_stock INTEGER DEFAULT NULL,
+            date_created DATE DEFAULT CURRENT_DATE,
+            last_updated DATE DEFAULT CURRENT_DATE,
+            category_id INTEGER NOT NULL,
+            PRIMARY KEY (id),
+            CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES product_category (id)
+            )
+
+        </sql>
+    </changeSet>
+    <changeSet id="AFO2021" author="30032021-02">
+        <sql>
+            INSERT INTO product_category(category_name) VALUES ('BOOKS');
+
+            INSERT INTO product (sku, name, description, image_url, active, units_in_stock,
+            unit_price, category_id, date_created)
+            VALUES ('BOOK-TECH-1000', 'JavaScript - The Fun Parts', 'Learn JavaScript',
+            'assets/images/products/placeholder.png'
+            ,B'1',100,19.99,1, NOW());
+
+            INSERT INTO product (sku, name, description, image_url, active, units_in_stock,
+            unit_price, category_id, date_created)
+            VALUES ('BOOK-TECH-1001', 'Spring Framework Tutorial', 'Learn Spring',
+            'assets/images/products/placeholder.png'
+            ,B'1',100,29.99,1, NOW());
+
+            INSERT INTO product (sku, name, description, image_url, active, units_in_stock,
+            unit_price, category_id, date_created)
+            VALUES ('BOOK-TECH-1002', 'Kubernetes - Deploying Containers', 'Learn Kubernetes',
+            'assets/images/products/placeholder.png'
+            ,B'1',100,24.99,1, NOW());
+
+            INSERT INTO product (sku, name, description, image_url, active, units_in_stock,
+            unit_price, category_id, date_created)
+            VALUES ('BOOK-TECH-1003', 'Internet of Things (IoT) - Getting Started', 'Learn IoT',
+            'assets/images/products/placeholder.png'
+            ,B'1',100,29.99,1, NOW());
+
+            INSERT INTO product (sku, name, description, image_url, active, units_in_stock,
+            unit_price, category_id, date_created)
+            VALUES ('BOOK-TECH-1004', 'The Go Programming Language: A to Z', 'Learn Go',
+            'assets/images/products/placeholder.png'
+            ,B'1',100,24.99,1, NOW());
+        </sql>
+    </changeSet>
+</databaseChangeLog>
+
