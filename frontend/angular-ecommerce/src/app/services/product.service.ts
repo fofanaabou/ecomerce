@@ -46,4 +46,11 @@ export class ProductService {
     );
   }
 
+  getProduct(theProductId: number): Observable<Product>{
+
+  // product urlconst s
+  const url = `${ApiUrl.PRODUCTS}/${theProductId}`;
+    return this.httpClient.get<Product>(url);
+  }
+
 }
