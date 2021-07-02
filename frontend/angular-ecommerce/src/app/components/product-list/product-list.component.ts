@@ -12,11 +12,18 @@ export class ProductListComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private route: ActivatedRoute) { }
-  public products: Product[];
-  public currentCategoryId: number;
+    private route: ActivatedRoute
+  ) { }
+
+  public products: Product[] = [];
+  public currentCategoryId: number = 1;
+  public previousCategoryId: number = 1;
   public currentCategoryName: string;
-  public searchMode: boolean;
+  public searchMode: boolean = false;
+
+  public thePageNumber: number = 1;
+  public thePageSize: number = 8;
+  public theTotalElements: number = 0;
 
   ngOnInit(): void {
   this.route.paramMap.subscribe(() => {
@@ -49,7 +56,22 @@ export class ProductListComponent implements OnInit {
           this.currentCategoryId = 1;
           this.currentCategoryName = 'Books';
           }
-      this.productService.getProductList(this.currentCategoryId).subscribe(data => {this.products = data });
+
+      // check if we have a different category than previous
+      
+      // Note; Angular will reuse a component if it is currently being viewed
+
+      // if we have a different category id than previous
+      // then set thePageNumber back to 1
+      if(this.previousCategoryId !==this.currentCategoryId){
+        this.thePageNumber = 1;
+      }
+
+      this.previousCategoryId = this.currentCategoryId;
+
+      console.log('currentCategoryId:', this.currentCategoryId, 'pageNumber:', this.thePageNumber);
+
+      this.productService.getProductListPaginate(this.thePageNumber-1, this.thePageSize, this.currentCategoryId).subscribe(this.processResult());
   }
 
   handleSearchProducts(){
@@ -59,6 +81,15 @@ export class ProductListComponent implements OnInit {
     this.productService.searchProducts(theKeyword).subscribe(data => {
       this.products = data;
     })
+  }
+
+  processResult(){ 
+    return data => {
+      this.products = data._embedded.products;
+      this.thePageNumber = data.page.number + 1;
+      this.thePageSize = data.page.size;
+      this.theTotalElements = data.page.totalElements;
+    };
   }
 
 }
