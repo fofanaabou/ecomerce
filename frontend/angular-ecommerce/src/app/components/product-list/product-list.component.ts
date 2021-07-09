@@ -22,7 +22,7 @@ export class ProductListComponent implements OnInit {
   public searchMode: boolean = false;
 
   public thePageNumber: number = 1;
-  public thePageSize: number = 8;
+  public thePageSize: number = 5;
   public theTotalElements: number = 0;
 
   ngOnInit(): void {
@@ -90,6 +90,12 @@ export class ProductListComponent implements OnInit {
       this.thePageSize = data.page.size;
       this.theTotalElements = data.page.totalElements;
     };
+  }
+
+  updatePageSize(pageSize: number) {
+    this.thePageSize = pageSize;
+    this.thePageNumber = 1;
+    this.listProducts();
   }
 
 }
