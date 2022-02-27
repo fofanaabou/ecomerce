@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CartItem } from '../common/cart-item';
-import { Subject, BehaviorSubject } from 'rxjs';
-import { temporaryDeclaration } from '@angular/compiler/src/compiler_util/expression_converter';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,36 +12,50 @@ export class CartService {
   totalPrice: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   totalQuantity: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
-  constructor() { }
+  // storage: Storage = sessionStorage;
+  storage: Storage = localStorage;
 
-  addToCart(theCartItem: CartItem){
-    let alreadyExistsInCart: boolean = false;
-    let existingCartItem: CartItem = undefined;
+  constructor() {
 
-    if(this.cartItems.length > 0){
+    // read data from storage
+    const data = JSON.parse(this.storage.getItem('cartItems'));
+
+    if  ( data != null) {
+      this.cartItems = data;
+
+      // compute totals based on the data is read from storage
+      this.computeCartTotal();
+    }
+  }
+
+  addToCart(theCartItem: CartItem): void{
+    let alreadyExistsInCart = false;
+    let existingCartItem: CartItem;
+
+    if (this.cartItems.length > 0){
 
       existingCartItem = this.cartItems.find(tempCartIem => tempCartIem.id === theCartItem.id);
 
       // check if we found item
-      alreadyExistsInCart = (existingCartItem != undefined);
+      alreadyExistsInCart = (existingCartItem !== undefined);
     }
 
 
-      if(alreadyExistsInCart){
+    if (alreadyExistsInCart){
         existingCartItem.quantity++;
       } else {
         this.cartItems.push(theCartItem);
       }
 
-      this.computeCartTotal();
+    this.computeCartTotal();
   }
 
-  computeCartTotal(){
-    let totalPriceValue: number = 0;
-    let totalQuantityValue: number = 0;
+  computeCartTotal(): void{
+    let totalPriceValue = 0;
+    let totalQuantityValue = 0;
 
-    for(let currentCartItem of this.cartItems){
-      totalPriceValue += currentCartItem.unitPrice*currentCartItem.quantity;
+    for (const currentCartItem of this.cartItems){
+      totalPriceValue += currentCartItem.unitPrice * currentCartItem.quantity;
       totalQuantityValue += currentCartItem.quantity;
     }
 
@@ -51,28 +64,35 @@ export class CartService {
     this.totalQuantity.next(totalQuantityValue);
 
     console.log('total:', totalPriceValue);
+
+    // persist cart data
+    this.persistCartItems();
   }
-  
-  remove(theCartItem){
+
+  remove(theCartItem): void{
 
     // get index of item in the array
     const itemIndex = this.cartItems.findIndex( tempCartItem => tempCartItem.id === theCartItem.id);
 
-    if(itemIndex > -1) {
+    if (itemIndex > -1) {
       this.cartItems.splice(itemIndex, 1);
       this.computeCartTotal();
     }
   }
 
-  decrementQuantity(theCartItem: CartItem){
+  decrementQuantity(theCartItem: CartItem): void{
 
     theCartItem.quantity--;
 
-    if(theCartItem.quantity === 0){
+    if (theCartItem.quantity === 0){
       this.remove(theCartItem);
     } else {
       this.computeCartTotal();
     }
+  }
+
+  persistCartItems(): void{
+    this.storage.setItem('cartItems', JSON.stringify(this.cartItems));
   }
 
 }
