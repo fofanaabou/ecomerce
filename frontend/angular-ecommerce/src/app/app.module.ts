@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {ProductService} from './services/product.service';
 import {CartService} from './services/cart.service';
 
@@ -30,6 +30,7 @@ import {
 import myAppConfig from './config/my-app-config';
 import { MembersPageComponent } from './components/members-page/members-page.component';
 import { OrderHistoryComponent } from './components/order-history/order-history.component';
+import {AuthInterceptorService} from './services/auth-interceptor.service';
 
 const oktaConfig = Object.assign({
   onAuthRequired: (oktaAuth: any, injector: { get: (arg0: typeof Router) => any; }) => {
@@ -83,7 +84,8 @@ const routes: Routes = [
     ReactiveFormsModule,
     OktaAuthModule
   ],
-  providers: [ProductService, CartService, {provide: OKTA_CONFIG, useValue: oktaConfig} ],
+  providers: [ProductService, CartService, {provide: OKTA_CONFIG, useValue: oktaConfig},
+    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptorService, multi: true} ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
