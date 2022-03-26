@@ -9,4 +9,5 @@ export class ApiUrl {
   static STATES_BY_COUNTRY = `${ApiUrl.STATES}/search/findByCountryCode?countryCode=`;
   static purchaseUrl = `${environment.baseUrl}/checkout/purchase`;
   static ORDER_URL = `${environment.baseUrl}/orders` ;
+  static PAYMENT_URL = `${environment.baseUrl}/checkout/payment-intent`;
 }

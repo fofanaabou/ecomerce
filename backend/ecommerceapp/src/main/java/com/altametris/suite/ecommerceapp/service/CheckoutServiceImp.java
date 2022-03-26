@@ -7,12 +7,14 @@ import com.altametris.suite.ecommerceapp.dto.PurchaseResponse;
 import com.altametris.suite.ecommerceapp.entity.Customer;
 import com.altametris.suite.ecommerceapp.entity.Order;
 import com.altametris.suite.ecommerceapp.entity.OrderItem;
+import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 @Service
@@ -20,7 +22,15 @@ public class CheckoutServiceImp implements CheckoutService{
 
     private final CustomerRepository customerRepository;
 
-    public CheckoutServiceImp(CustomerRepository customerRepository, @Value("${stripe.key.secret}") String secretKey){
+    @Value("${stripe.key.secret}")
+    private String secretKey;
+
+    @PostConstruct()
+    public void init(){
+        Stripe.apiKey = secretKey;
+    }
+
+    public CheckoutServiceImp(CustomerRepository customerRepository){
         this.customerRepository = customerRepository;
     }
 
@@ -76,6 +86,8 @@ public class CheckoutServiceImp implements CheckoutService{
         params.put("amount",paymentInfo.getAmount());
         params.put("currency", paymentInfo.getCurrency());
         params.put("payment_method_types", paymentMethodTypes);
+        params.put("description", "EMPIRE FOFANA PURCHASE");
+        params.put("receipt_email", paymentInfo.getReceiptEmail());
         return PaymentIntent.create(params);
     }
 
